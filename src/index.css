@@ -1,0 +1,89 @@
+
+@import "tailwindcss";
+@import "./theme/tokens.css";
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* Use a light default theme so pages that set their own backgrounds render correctly */
+  color-scheme: light dark;
+  color: #213547;
+  background-color: #ffffff;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  /* Use container color for links (no global blue). Components should set text color explicitly. */
+  color: inherit;
+  text-decoration: inherit;
+}
+a:hover {
+  color: inherit;
+}
+
+body {
+  margin: 0;
+  /* Do not globally center the app; let route/layout components control layout
+     (global centering caused the login layout to not span full width). */
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: inherit;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+/* Make native select controls match the dark theme (including option list) */
+select,
+select option {
+  background-color: var(--card) !important;
+  color: var(--text) !important;
+  border-color: var(--line) !important;
+}
+
+/* On focus, keep the dark themed outline */
+select:focus {
+  outline: none;
+  box-shadow: var(--ring);
+}

@@ -1,0 +1,57 @@
+/* Semantic design tokens: single dark theme */
+
+:root {
+  /* Dark surfaces (navy / dark-blue theme — not pure black) */
+  --bg: #0b1020; /* layout background: rgb(11,16,32) */
+  --card: #0f2338; /* card surface: navy-blue (lighter than pure black) */
+  --line: #1b2b3a; /* subtle border between card and background */
+
+  /* Text */
+  --text: #e5e7eb;
+  --muted: #94a3b8;
+
+  /* Brand / States */
+  --primary: #818cf8;
+  --primary-ink: #0b1020;
+  --success: #34d399;
+  --warn: #fbbf24;
+  --danger: #f87171;
+
+  /* Effects */
+  --ring: 0 0 0 3px rgba(129, 140, 248, .28);
+
+  /* Radii & spacing */
+  --r-lg: 16px;
+  --r-md: 12px;
+  --r-sm: 8px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+}
+
+/* Small helpers that play nicely with Tailwind */
+.muted { color: var(--muted); }
+.card  { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); }
+
+/* Map common 'light' utility classes to dark equivalents so existing components
+   that use classes like `bg-white`, `text-gray-*`, or `rounded-xl` render
+   correctly in the dark-only project. These use `!important` to reliably
+   override Tailwind's utility rules where necessary. */
+
+.bg-white {
+  background-color: var(--card) !important;
+  color: var(--text) !important;
+  border-color: var(--line) !important;
+}
+
+.rounded-xl { border-radius: var(--r-lg) !important; }
+.shadow-sm { box-shadow: 0 6px 18px rgba(6,12,24,0.45) !important; }
+
+.text-gray-500, .text-gray-400, .text-gray-600 { color: var(--muted) !important; }
+
+/* Ensure body/background defaults to dark background */
+body, html { background: var(--bg); color: var(--text); }
+

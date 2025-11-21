@@ -1,0 +1,9 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Location pin icon -->
+  <path d="M20 3C14.5 3 10 7.5 10 13C10 20.5 20 35 20 35S30 20.5 30 13C30 7.5 25.5 3 20 3Z" fill="currentColor"/>
+  <circle cx="20" cy="13" r="4" fill="white"/>
+  <!-- Ripple effect -->
+  <ellipse cx="20" cy="32" rx="8" ry="2" fill="currentColor" opacity="0.3"/>
+  <ellipse cx="20" cy="32" rx="6" ry="1.5" fill="currentColor" opacity="0.5"/>
+  <ellipse cx="20" cy="32" rx="4" ry="1" fill="currentColor" opacity="0.7"/>
+</svg>
