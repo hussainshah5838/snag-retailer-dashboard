@@ -8,16 +8,22 @@ export async function fetchDashboardSummary(signal) {
   if (USE_MOCK) {
     await sleep();
     return {
-      totalRetailers: 12,
-      activeStores: 28,
+      totalMerchants: 12,
+      activeBranches: 28,
       liveOffers: 7,
       totalViews: 12456,
       totalRedemptions: 342,
     };
   }
 
-  const res = await apiClient.get("/dashboard/summary", { signal });
-  return res.data;
+  const res = await apiClient.get("/retailer/dashboard/summary", { signal });
+  
+  // Handle backend response format
+  if (res.data.success && res.data.data) {
+    return res.data.data;
+  } else {
+    return res.data;
+  }
 }
 
 export async function fetchViewsAndImpressions(signal) {
@@ -33,8 +39,14 @@ export async function fetchViewsAndImpressions(signal) {
     return data;
   }
 
-  const res = await apiClient.get("/dashboard/views-impressions", { signal });
-  return res.data;
+  const res = await apiClient.get("/retailer/dashboard/views-impressions", { signal });
+  
+  // Handle backend response format
+  if (res.data.success && res.data.data) {
+    return res.data.data;
+  } else {
+    return res.data;
+  }
 }
 
 export async function fetchRedemptions(signal) {
@@ -48,8 +60,14 @@ export async function fetchRedemptions(signal) {
     return data;
   }
 
-  const res = await apiClient.get("/dashboard/redemptions", { signal });
-  return res.data;
+  const res = await apiClient.get("/retailer/dashboard/redemptions", { signal });
+  
+  // Handle backend response format
+  if (res.data.success && res.data.data) {
+    return res.data.data;
+  } else {
+    return res.data;
+  }
 }
 
 export async function fetchTopOffers(params = {}, signal) {
@@ -62,11 +80,17 @@ export async function fetchTopOffers(params = {}, signal) {
     ];
   }
 
-  const res = await apiClient.get("/dashboard/top-offers", {
+  const res = await apiClient.get("/retailer/dashboard/top-offers", {
     params,
     signal,
   });
-  return res.data;
+  
+  // Handle backend response format
+  if (res.data.success && res.data.data) {
+    return res.data.data;
+  } else {
+    return res.data;
+  }
 }
 
 export async function fetchActivityFeed(params = {}, signal) {
@@ -75,28 +99,37 @@ export async function fetchActivityFeed(params = {}, signal) {
     return [
       {
         id: "a1",
-        title: "Offer created",
+        title: "New offer created",
         description: "50% off Coffee",
         timeAgo: "2h",
+        type: "offer"
       },
       {
         id: "a2",
-        title: "Merchant signed up",
+        title: "New merchant joined",
         description: "Joe's Diner",
         timeAgo: "6h",
+        type: "merchant"
       },
       {
         id: "a3",
-        title: "Offer expired",
+        title: "Offer redeemed",
         description: "Free Dessert",
         timeAgo: "1d",
+        type: "redemption"
       },
     ];
   }
 
-  const res = await apiClient.get("/dashboard/activity", {
+  const res = await apiClient.get("/retailer/dashboard/activity", {
     params,
     signal,
   });
-  return res.data;
+  
+  // Handle backend response format
+  if (res.data.success && res.data.data) {
+    return res.data.data;
+  } else {
+    return res.data;
+  }
 }

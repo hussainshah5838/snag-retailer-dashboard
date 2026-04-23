@@ -3,22 +3,40 @@ import { useNavigate } from "react-router-dom";
 import { PATHS } from "../routes/paths";
 import { signOut, getCurrentUser } from "../auth/api/auth.service";
 
-export default function UserMenu() {
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-  const [imgFailed, setImgFailed] = useState(false);
-  const ref = useRef(null);
-  const btnRef = useRef(null);
-
+function readUser() {
   const user = getCurrentUser();
+  if (!user) return { initials: "R", avatarSrc: null };
+  const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.name || "";
   const initials =
-    (user?.name || user?.email || "")
+    (fullName || user.email || "")
       .split(" ")
       .map((s) => s[0])
       .slice(0, 2)
       .join("")
-      .toUpperCase() || "U";
+      .toUpperCase() || "R";
+  const avatarSrc = user.avatarUrl || user.avatar || null;
+  return { initials, avatarSrc };
+}
 
+export default function UserMenu() {
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [imgFailed, setImgFailed] = useState(false);
+  const [userInfo, setUserInfo] = useState(readUser);
+  const ref = useRef(null);
+  const btnRef = useRef(null);
+
+  // Re-read user from localStorage whenever the profile page updates it
+  useEffect(() => {
+    const refresh = () => {
+      setUserInfo(readUser());
+      setImgFailed(false); // reset so new avatar src is tried
+    };
+    window.addEventListener("profile:updated", refresh);
+    return () => window.removeEventListener("profile:updated", refresh);
+  }, []);
+
+  // Close dropdown on outside click
   useEffect(() => {
     const onDoc = (e) => {
       if (
@@ -40,47 +58,55 @@ export default function UserMenu() {
     navigate(PATHS.auth?.login || "/login", { replace: true });
   }
 
+  const { initials, avatarSrc } = userInfo;
+
   return (
     <div className="relative">
       <button
         ref={btnRef}
         onClick={() => setOpen((v) => !v)}
-        className="h-9 w-9 rounded-full overflow-hidden border btn-ghost grid place-items-center text-sm font-medium"
+        className="relative h-9 w-9 rounded-full overflow-hidden border btn-ghost"
         style={{
           borderColor: "var(--line)",
           background: "var(--card)",
-          color: "var(--text)",
+          flexShrink: 0,
         }}
         aria-label="Open user menu"
       >
-        {!imgFailed ? (
+        {!imgFailed && avatarSrc ? (
           <img
-            src={user?.avatar || "https://i.pravatar.cc/80"}
+            src={avatarSrc}
             alt="avatar"
-            className="h-full w-full object-cover"
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
             onError={() => setImgFailed(true)}
           />
         ) : (
-          <svg
-            viewBox="0 0 24 24"
-            className="w-5 h-5"
-            style={{ color: "var(--muted)" }}
-            fill="currentColor"
-            aria-hidden="true"
+          <span
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "13px",
+              fontWeight: 600,
+              color: "var(--text)",
+              lineHeight: 1,
+            }}
           >
-            <path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-3.866 0-7 3.134-7 7h2c0-2.761 2.239-5 5-5s5 2.239 5 5h2c0-3.866-3.134-7-7-7z" />
-          </svg>
+            {initials}
+          </span>
         )}
       </button>
 
       {open && (
         <div
           ref={ref}
-          className="absolute right-0 mt-2 w-44 rounded-xl border shadow-lg"
+          className="absolute right-0 mt-2 w-44 rounded-xl border shadow-lg z-50"
           style={{ borderColor: "var(--line)", background: "var(--card)" }}
         >
           <button
-            className="w-full text-left px-3 py-2 hover:bg-slate-100/6"
+            className="w-full text-left px-3 py-2 hover:bg-slate-100/6 rounded-t-xl"
             onClick={() => {
               setOpen(false);
               navigate(PATHS.admin?.profile || "/app/profile");
@@ -90,7 +116,7 @@ export default function UserMenu() {
           </button>
           <div className="border-t" style={{ borderColor: "var(--line)" }} />
           <button
-            className="w-full text-left px-3 py-2 text-rose-400 hover:bg-slate-100/6"
+            className="w-full text-left px-3 py-2 text-rose-400 hover:bg-slate-100/6 rounded-b-xl"
             onClick={() => {
               setOpen(false);
               handleLogout();

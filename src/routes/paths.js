@@ -7,7 +7,7 @@ export const PATHS = {
   admin: {
     root: "/app",
     dashboard: "/app/dashboard",
-    retailers: "/app/retailers",
+    retailers: "/app/merchants",
     offers: "/app/offers",
     offersBulk: "/app/offers/bulk",
     audience: "/app/audience",

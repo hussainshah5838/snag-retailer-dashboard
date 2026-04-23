@@ -18,7 +18,7 @@ import {
 const TABS = [
   { id: "offers", label: "Offers" },
   { id: "templates", label: "Templates" },
-  { id: "bulk", label: "Bulk Upload" },
+  // { id: "bulk", label: "Bulk Upload" },
 ];
 
 function Offers() {
@@ -83,14 +83,10 @@ function Offers() {
     setSelectedOffer(row);
   }
 
-  async function handleSaveOffer(payload, image) {
+  async function handleSaveOffer(payload, bannerFile) {
     try {
-      // If form passed an image with previewUrl, attach as imageUrl to payload
-      const sendPayload = { ...payload };
-      if (image && image.previewUrl) sendPayload.imageUrl = image.previewUrl;
-
       if (editOffer) {
-        const updated = await updateOffer(editOffer.id, sendPayload);
+        const updated = await updateOffer(editOffer.id, payload, bannerFile);
         setOffersData((prev) => ({
           ...prev,
           items: (prev.items || []).map((it) =>
@@ -98,7 +94,7 @@ function Offers() {
           ),
         }));
       } else {
-        const created = await createOffer(sendPayload);
+        const created = await createOffer(payload, bannerFile);
         setOffersData((prev) => ({
           items: [created, ...(prev.items || [])].slice(0, limit),
           total: (prev.total || 0) + 1,
@@ -107,8 +103,7 @@ function Offers() {
       setPage(1);
     } catch (err) {
       console.error("Failed to save offer:", err);
-      setOffersError("Failed to save offer.");
-      // Don't re-throw so the form can close gracefully and UI shows an error message
+      setOffersError(err?.response?.data?.error?.message || "Failed to save offer.");
     }
   }
 
@@ -148,9 +143,9 @@ function Offers() {
                 }
               >
                 <option value="">All Statuses</option>
-                <option value="live">Live</option>
+                <option value="active">Active</option>
                 <option value="scheduled">Scheduled</option>
-                <option value="paused">Paused</option>
+                <option value="draft">Draft</option>
                 <option value="expired">Expired</option>
               </select>
               <button

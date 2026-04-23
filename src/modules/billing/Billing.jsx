@@ -45,7 +45,6 @@ function Billing() {
       setInvoices(invItems);
       setPaymentMethods(pmItems);
     } catch (err) {
-      // let caller handle the error
       throw err;
     }
   }

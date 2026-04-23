@@ -29,11 +29,31 @@ const SAMPLE_OFFERS = [
 ];
 
 function TopOffersTable({ offers }) {
-  const safeOffers =
-    Array.isArray(offers) && offers.length ? offers : SAMPLE_OFFERS;
+  // Don't show sample data if offers is empty/null - show loading instead
+  if (!offers || offers.length === 0) {
+    return (
+      <div className="bg-gray-800 rounded-xl p-4 shadow-sm">
+        <h3 className="text-sm font-semibold mb-3 text-gray-100">Top Offers</h3>
+        <div className="flex items-center justify-center py-8">
+          <div className="text-gray-400 text-sm">Loading offers...</div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Transform backend data to match table structure
+  const transformedOffers = offers.map(offer => ({
+    id: offer.id,
+    name: offer.title || offer.name,
+    retailerName: offer.merchantName || offer.retailerName || "Unknown Merchant",
+    views: offer.views || 0,
+    redemptions: offer.redemptions || 0,
+    ctr: offer.ctr || (offer.views > 0 ? ((offer.redemptions / offer.views) * 100).toFixed(1) : 0),
+  }));
+
   const columns = [
     { key: "name", label: "Offer" },
-    { key: "retailerName", label: "Retailer" },
+    { key: "retailerName", label: "Merchant" },
     { key: "views", label: "Views" },
     { key: "redemptions", label: "Redemptions" },
     { key: "ctr", label: "CTR %" },
@@ -42,7 +62,7 @@ function TopOffersTable({ offers }) {
   return (
     <div className="bg-gray-800 rounded-xl p-4 shadow-sm">
       <h3 className="text-sm font-semibold mb-3 text-gray-100">Top Offers</h3>
-      <DataTable columns={columns} data={safeOffers} />
+      <DataTable columns={columns} data={transformedOffers} />
     </div>
   );
 }

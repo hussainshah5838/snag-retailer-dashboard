@@ -1,6 +1,6 @@
 import apiClient from "../../../shared/http/client";
 
-const USE_MOCK = !import.meta.env.VITE_API_URL;
+const USE_MOCK = true; // Force mock data for retailer users
 const delay = (ms = 250) => new Promise((resolve) => setTimeout(resolve, ms));
 
 let MOCK_RETAILER_USERS = [

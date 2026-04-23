@@ -19,11 +19,14 @@ export default function Login() {
     setBusy(true);
     try {
       const res = await signIn({ email: email.trim(), password: pw });
+      
       if (res?.ok) {
         try {
           if (res.token) localStorage.setItem("auth_token", res.token);
+          if (res.refreshToken) localStorage.setItem("refresh_token", res.refreshToken);
           const storageObj = {
             token: res.token ?? null,
+            refreshToken: res.refreshToken ?? null,
             user: res.user ?? null,
           };
           localStorage.setItem("zavolla_auth", JSON.stringify(storageObj));
@@ -33,7 +36,9 @@ export default function Login() {
         const returnTo =
           location?.state?.from?.pathname || PATHS.admin.dashboard;
         nav(returnTo);
-      } else setErr("Sign-in failed");
+      } else {
+        setErr("Sign-in failed");
+      }
     } catch (e2) {
       setErr(e2.message || "Sign-in failed");
     } finally {

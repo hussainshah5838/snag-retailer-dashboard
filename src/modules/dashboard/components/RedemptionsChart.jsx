@@ -12,10 +12,30 @@ const SAMPLE_REDEMPTIONS = [
 ];
 
 function RedemptionsChart({ data }) {
-  // Use sample data when none provided so the chart area shows meaningful
-  // content in mock or API-less environments.
-  if (!data || (Array.isArray(data) && data.length === 0)) {
-    data = SAMPLE_REDEMPTIONS;
+  // Show loading state if no data
+  if (!data) {
+    return (
+      <div className="bg-slate-900 rounded-xl p-4 shadow-sm h-full">
+        <h3 className="text-sm font-semibold mb-2 text-slate-100">
+          Redemptions Over Time
+        </h3>
+        <div className="flex items-center justify-center py-8">
+          <div className="text-gray-400 text-sm">Loading chart data...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // If there's empty data, show no data message
+  if (Array.isArray(data) && data.length === 0) {
+    return (
+      <div className="bg-slate-900 rounded-xl p-4 shadow-sm h-full">
+        <h3 className="text-sm font-semibold mb-2 text-slate-100">
+          Redemptions Over Time
+        </h3>
+        <div className="text-sm text-slate-300">No data points to display.</div>
+      </div>
+    );
   }
 
   let chartData = null;

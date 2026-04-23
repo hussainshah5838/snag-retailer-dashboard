@@ -5,35 +5,29 @@ import Badge from "../../../shared/components/Badge";
 function statusBadge(status) {
   const s = (status || "").toLowerCase();
   let variant = "default";
-  if (s === "live") variant = "success";
+  if (s === "active")         variant = "success";
   else if (s === "scheduled") variant = "info";
-  else if (s === "paused") variant = "warning";
-  else if (s === "expired" || s === "cancelled") variant = "danger";
+  else if (s === "draft")     variant = "warning";
+  else if (s === "expired")   variant = "danger";
   return <Badge variant={variant}>{status}</Badge>;
+}
+
+function fmt(dateStr) {
+  if (!dateStr) return "-";
+  return new Date(dateStr).toLocaleDateString();
 }
 
 function OfferListTable({ data, onEdit, onDelete, onView, onStatusChange }) {
   const columns = [
-    { key: "name", label: "Offer" },
-    { key: "retailerName", label: "Retailer" },
-    {
-      key: "status",
-      label: "Status",
-      render: (row) => statusBadge(row.status),
-    },
-    { key: "startAt", label: "Start" },
-    { key: "endAt", label: "End" },
-    { key: "templateName", label: "Template" },
-    {
-      key: "discount",
-      label: "Discount",
-      render: (row) =>
-        row.discountType === "amount"
-          ? `$${row.discountValue}`
-          : `${row.discountValue}%`,
-    },
-    { key: "radiusKm", label: "Radius (km)" },
-    { key: "maxRedemptions", label: "Max Redemptions" },
+    { key: "title",        label: "Offer",       render: (row) => row.title },
+    { key: "merchantName", label: "Merchant",    render: (row) => row.merchantName },
+    { key: "status",       label: "Status",      render: (row) => statusBadge(row.status) },
+    { key: "offerType",    label: "Type",        render: (row) => row.offerType },
+    { key: "startDate",    label: "Start",       render: (row) => fmt(row.startDate) },
+    { key: "endDate",      label: "End",         render: (row) => fmt(row.endDate) },
+    { key: "discountType", label: "Discount",    render: (row) => row.discountType || "-" },
+    { key: "couponCode",   label: "Coupon",      render: (row) => row.couponCode || "-" },
+    { key: "redemptions",  label: "Redemptions", render: (row) => row.stats?.redemptions ?? 0 },
   ];
 
   return (
@@ -42,7 +36,7 @@ function OfferListTable({ data, onEdit, onDelete, onView, onStatusChange }) {
       data={data}
       onRowClick={onView}
       actions={[
-        { label: "Edit", onClick: onEdit },
+        { label: "Edit",   onClick: onEdit },
         { label: "Delete", onClick: onDelete },
         onStatusChange
           ? {
@@ -52,13 +46,12 @@ function OfferListTable({ data, onEdit, onDelete, onView, onStatusChange }) {
                   value={row.status || ""}
                   onChange={(e) => onStatusChange(row, e.target.value)}
                   className="text-xs bg-transparent border rounded px-2 py-1"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  <option value="">-</option>
-                  <option value="live">Live</option>
+                  <option value="active">Active</option>
                   <option value="scheduled">Scheduled</option>
-                  <option value="paused">Paused</option>
+                  <option value="draft">Draft</option>
                   <option value="expired">Expired</option>
-                  <option value="cancelled">Cancelled</option>
                 </select>
               ),
             }

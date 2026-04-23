@@ -12,9 +12,30 @@ const SAMPLE_VIEWS = [
 ];
 
 function ViewsImpressionsChart({ data }) {
-  // If there's no data, substitute a small sample so chart area isn't empty.
-  if (!data || (Array.isArray(data) && data.length === 0)) {
-    data = SAMPLE_VIEWS;
+  // Show loading state if no data
+  if (!data) {
+    return (
+      <div className="bg-slate-900 rounded-xl p-4 shadow-sm h-full">
+        <h3 className="text-sm font-semibold mb-2 text-slate-100">
+          Views & Impressions
+        </h3>
+        <div className="flex items-center justify-center py-8">
+          <div className="text-gray-400 text-sm">Loading chart data...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // If there's empty data, show no data message
+  if (Array.isArray(data) && data.length === 0) {
+    return (
+      <div className="bg-slate-900 rounded-xl p-4 shadow-sm h-full">
+        <h3 className="text-sm font-semibold mb-2 text-slate-100">
+          Views & Impressions
+        </h3>
+        <div className="text-sm text-slate-300">No data points to display.</div>
+      </div>
+    );
   }
 
   // Prepare chartData in a safe way (no JSX inside try/catch)

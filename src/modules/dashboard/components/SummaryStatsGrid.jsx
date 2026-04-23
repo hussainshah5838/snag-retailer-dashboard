@@ -5,8 +5,8 @@ function SummaryStatsGrid({ summary }) {
   if (!summary) return null;
 
   const {
-    totalRetailers = 0,
-    activeStores = 0,
+    totalMerchants = 0,
+    activeBranches = 0,
     liveOffers = 0,
     totalViews = 0,
     totalRedemptions = 0,
@@ -14,8 +14,8 @@ function SummaryStatsGrid({ summary }) {
 
   return (
     <div className="grid gap-4 grid-cols-1 md:grid-cols-3 xl:grid-cols-5">
-      <StatsCard title="Total Retailers" value={totalRetailers} />
-      <StatsCard title="Active Stores" value={activeStores} />
+      <StatsCard title="Total Merchants" value={totalMerchants} />
+      <StatsCard title="Active Branches" value={activeBranches} />
       <StatsCard title="Live Offers" value={liveOffers} />
       <StatsCard title="Total Views" value={totalViews} />
       <StatsCard title="Total Redemptions" value={totalRedemptions} />

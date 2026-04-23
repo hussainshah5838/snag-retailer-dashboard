@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ConfirmDialog from "../../../shared/components/ConfirmDialog";
-import { fetchRetailers } from "../../retailer-management/api/retailers.service";
+import { fetchMerchants } from "../../retailer-management/api/merchants.service";
 
 function PromotionRuleForm({ initialValue, open, onClose, onSave }) {
   const [form, setForm] = useState({
@@ -11,6 +11,7 @@ function PromotionRuleForm({ initialValue, open, onClose, onSave }) {
     maxDurationDays: "",
     allowOpenEnded: false,
   });
+  const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -33,27 +34,28 @@ function PromotionRuleForm({ initialValue, open, onClose, onSave }) {
         allowOpenEnded: false,
       });
     }
+    setErrors({});
   }, [initialValue, open]);
 
-  const [retailers, setRetailers] = useState([]);
-  const [retailersLoading, setRetailersLoading] = useState(false);
-  const [retailersError, setRetailersError] = useState(null);
+  const [merchants, setMerchants] = useState([]);
+  const [merchantsLoading, setMerchantsLoading] = useState(false);
+  const [merchantsError, setMerchantsError] = useState(null);
 
   useEffect(() => {
     let mounted = true;
     const ac = new AbortController();
     async function load() {
       try {
-        setRetailersLoading(true);
-        const res = await fetchRetailers({ limit: 100 }, ac.signal);
+        setMerchantsLoading(true);
+        const res = await fetchMerchants({ limit: 100 }, ac.signal);
         if (!mounted) return;
-        setRetailers(res.items || []);
+        setMerchants(res.items || []);
       } catch (err) {
         if (err.name === "CanceledError" || err.name === "AbortError") return;
-        console.warn("Failed to load retailers", err);
-        setRetailersError(err);
+        console.warn("Failed to load merchants", err);
+        setMerchantsError(err);
       } finally {
-        if (mounted) setRetailersLoading(false);
+        if (mounted) setMerchantsLoading(false);
       }
     }
     load();
@@ -69,10 +71,26 @@ function PromotionRuleForm({ initialValue, open, onClose, onSave }) {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+  }
+
+  function validate() {
+    const errs = {};
+    if (!form.name.trim() || form.name.trim().length < 2)
+      errs.name = "Name must be at least 2 characters";
+    if (form.scope === "retailer" && !form.retailerId)
+      errs.retailerId = "Please select a merchant";
+    if (form.maxLiveOffersPerStore !== "" && Number(form.maxLiveOffersPerStore) < 0)
+      errs.maxLiveOffersPerStore = "Must be 0 or greater";
+    if (form.maxDurationDays !== "" && Number(form.maxDurationDays) < 0)
+      errs.maxDurationDays = "Must be 0 or greater";
+    return errs;
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
+    const errs = validate();
+    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     try {
       setSubmitting(true);
       const payload = {
@@ -103,8 +121,8 @@ function PromotionRuleForm({ initialValue, open, onClose, onSave }) {
             value={form.name}
             onChange={handleChange}
             className="border rounded-md px-2 py-1 text-sm w-full"
-            required
           />
+          {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -122,40 +140,25 @@ function PromotionRuleForm({ initialValue, open, onClose, onSave }) {
           </div>
           {form.scope === "retailer" && (
             <div>
-              <label className="block text-xs font-medium mb-1">
-                Retailer ID
-              </label>
-              {retailersLoading ? (
-                <div className="text-sm text-gray-500">Loading retailers…</div>
-              ) : retailersError ? (
-                <input
+              <label className="block text-xs font-medium mb-1">Merchant</label>
+              {merchantsLoading ? (
+                <div className="text-sm text-gray-500">Loading merchants…</div>
+              ) : (
+                <select
                   name="retailerId"
                   value={form.retailerId}
                   onChange={handleChange}
-                  placeholder="Enter retailer id"
                   className="border rounded-md px-2 py-1 text-sm w-full"
-                  required={form.scope === "retailer"}
-                />
-              ) : (
-                <>
-                  <input
-                    name="retailerId"
-                    list="retailers-list"
-                    value={form.retailerId}
-                    onChange={handleChange}
-                    placeholder="Select or type retailer id"
-                    className="border rounded-md px-2 py-1 text-sm w-full"
-                    required={form.scope === "retailer"}
-                  />
-                  <datalist id="retailers-list">
-                    {retailers.map((r) => (
-                      <option key={r.id} value={r.id}>
-                        {r.id} — {r.name}
-                      </option>
-                    ))}
-                  </datalist>
-                </>
+                >
+                  <option value="">Select a merchant</option>
+                  {merchants.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {`${r.firstName} ${r.lastName}`.trim()}
+                    </option>
+                  ))}
+                </select>
               )}
+              {errors.retailerId && <p className="text-xs text-red-500 mt-1">{errors.retailerId}</p>}
             </div>
           )}
         </div>
@@ -173,6 +176,7 @@ function PromotionRuleForm({ initialValue, open, onClose, onSave }) {
               onChange={handleChange}
               className="border rounded-md px-2 py-1 text-sm w-full"
             />
+            {errors.maxLiveOffersPerStore && <p className="text-xs text-red-500 mt-1">{errors.maxLiveOffersPerStore}</p>}
           </div>
           <div>
             <label className="block text-xs font-medium mb-1">
@@ -186,6 +190,7 @@ function PromotionRuleForm({ initialValue, open, onClose, onSave }) {
               onChange={handleChange}
               className="border rounded-md px-2 py-1 text-sm w-full"
             />
+            {errors.maxDurationDays && <p className="text-xs text-red-500 mt-1">{errors.maxDurationDays}</p>}
           </div>
         </div>
 

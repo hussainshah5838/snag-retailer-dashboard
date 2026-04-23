@@ -1,4 +1,3 @@
-// ...existing code...
 import React from "react";
 import {
   BrowserRouter,
@@ -10,6 +9,7 @@ import {
 } from "react-router-dom";
 
 import { PATHS } from "./paths";
+import { isAuthenticated } from "../auth/api/auth.service";
 
 // Auth
 import Login from "../auth/Login";
@@ -32,13 +32,14 @@ import RuntimeErrorBoundary from "../components/RuntimeErrorBoundary";
 
 function RequireAuth() {
   const location = useLocation();
-  const token = window.localStorage.getItem("auth_token");
-  if (!token) {
-    // include current location so Login can redirect back after successful auth
+  
+  if (!isAuthenticated()) {
+    // Redirect to login with current location so we can redirect back after auth
     return (
       <Navigate to={PATHS.auth.login} state={{ from: location }} replace />
     );
   }
+  
   return <Outlet />;
 }
 
@@ -57,15 +58,15 @@ function AppRouter() {
         {/* Auth */}
         <Route path={PATHS.auth.login} element={<Login />} />
 
-        {/* Protected admin area - ensure nested routes match by using "/*" */}
-        <Route>
+        {/* Protected admin area */}
+        <Route element={<RequireAuth />}>
           <Route path={`${PATHS.admin.root}/*`} element={<AdminRoutes />}>
             <Route
               index
               element={<Navigate to={PATHS.admin.dashboard} replace />}
             />
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="retailers" element={<RetailerManagement />} />
+            <Route path="merchants" element={<RetailerManagement />} />
             <Route path="offers" element={<Offers />} />
             <Route path="offers/bulk" element={<BulkUpload />} />
             <Route path="audience" element={<AudienceTargeting />} />
@@ -92,4 +93,3 @@ function AppRouter() {
 }
 
 export default AppRouter;
-// ...existing code...

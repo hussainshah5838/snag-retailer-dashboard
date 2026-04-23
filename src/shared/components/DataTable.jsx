@@ -60,7 +60,7 @@ function DataTable({ columns = [], data = [], onRowClick, actions = [] }) {
                           onClick={() => act.onClick && act.onClick(row)}
                           className="px-2 py-1 text-xs bg-blue-600 text-white rounded-md"
                         >
-                          {act.label}
+                          {typeof act.label === "function" ? act.label(row) : act.label}
                         </button>
                       )}
                     </div>

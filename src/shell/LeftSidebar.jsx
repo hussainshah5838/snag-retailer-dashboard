@@ -89,6 +89,17 @@ const Icon = ({ name, className = "w-4 h-4" }) => {
           <path d="M12 3l7 4v10l-7 4-7-4V7l7-4z" strokeWidth="1.5" />
         </svg>
       );
+    case "profile":
+      return (
+        <svg
+          className={`${className} ${common}`}
+          viewBox="0 0 24 24"
+          fill="none"
+        >
+          <circle cx="12" cy="8" r="4" strokeWidth="1.5" />
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      );
     case "logout":
       return (
         <svg
@@ -112,12 +123,12 @@ const Icon = ({ name, className = "w-4 h-4" }) => {
 const NAV_ITEMS = [
   { label: "Dashboard", to: PATHS.admin.dashboard, icon: "dashboard" },
   {
-    label: "Retailer Management",
+    label: "Merchant Management",
     to: PATHS.admin.retailers,
     icon: "retailers",
   },
   { label: "Offers", to: PATHS.admin.offers, icon: "offers" },
-  { label: "Bulk Upload", to: PATHS.admin.offersBulk, icon: "offers" },
+  // { label: "Bulk Upload", to: PATHS.admin.offersBulk, icon: "offers" },
   { label: "Audience", to: PATHS.admin.audience, icon: "audience" },
   {
     label: "Promotion Limits",
@@ -127,14 +138,15 @@ const NAV_ITEMS = [
   { label: "Billing", to: PATHS.admin.billing, icon: "billing" },
   { label: "Financials", to: PATHS.admin.billingFinancials, icon: "billing" },
   { label: "Legal", to: PATHS.admin.legal, icon: "legal" },
+  { label: "Profile", to: PATHS.admin.profile, icon: "profile" },
 ];
 
 export default function LeftSidebar({ open = true, onClose }) {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    signOut();
-    navigate("/auth/login", { replace: true });
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/login", { replace: true });
   };
 
   return (
